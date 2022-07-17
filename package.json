@@ -1,0 +1,29 @@
+{
+  "name": "GitHub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "devStart": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "config": "^3.3.7",
+    "ejs": "^3.1.8",
+    "express": "^4.16.4",
+    "express-ejs-layouts": "^2.5.0",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^5.4.18"
+  },
+  "devDependencies": {
+    "dotenv": "^6.2.0",
+    "nodemon": "^2.0.19"
+  }
+}
