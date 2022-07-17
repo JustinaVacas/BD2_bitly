@@ -1,3 +1,5 @@
+//import { createClient } from 'redis';
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
@@ -27,6 +29,16 @@ mongoose.connect(process.env.DATABASE_URL, {
 const db = mongoose.connection
 db.on('error', error => console.error(error))
 db.once('open', () => console.log('Connected to Mongoose'))
+
+// const client = createClient({
+// 	url: process.env.REDIS_URL
+// });
+//
+// client.on('error', (err) => console.log('Redis Client Error', err));
+//
+// await client.connect();
+//
+// export const redisClient = client;
 
 const auth = require('./routes/auth');
 const users = require('./routes/users');
