@@ -8,7 +8,7 @@
   <title>Document</title>
 </head>
 <body>
-  <h1>Hi <%= name %></h1>
+  <h1>Hi </h1>
   <form action="/api/auth" method="DELETE">
     <button type="submit">Log Out</button>
   </form>
@@ -30,13 +30,6 @@
         </tr>
       </thead>
       <tbody>
-        <% shortUrls.forEach(shortUrl => { %>
-          <tr>
-            <td><a href="<%= shortUrl.full %>"><%= shortUrl.full %></a></td>
-            <td><a href="<%= shortUrl.short %>"><%= shortUrl.short %></a></td>
-            <td><%= shortUrl.clicks %></td>
-          </tr>
-        <% }) %>
       </tbody>
     </table>
   </div>

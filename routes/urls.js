@@ -18,24 +18,20 @@ function authenticateToken(req, res, next) {
 
 router.post('/', authenticateToken, async (req, res) => {
     // First Validate The Request
-    const { error } = validate(req.body);
+    /*const { error } = validate(req.body);
     if (error) {
         return res.status(400).send(error.details[0].message);
-    }
+    }*/
 
-    // Check if this link already exisits
+    // Check if this link already exists
     let url = await Url.findOne({ full: req.body.full });
     // short
-    if (user) {
-        return res.status(400).send('That user already exisits!');
+    if (url) {
+        return res.status(400).send('That url already exists!');
     } else {
         // Insert the new user if they do not exist yet
-        url = new Url(_.pick(req.body, ['full', 'short', 'password']));
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
+        url = new Url(_.pick(req.body, ['full', 'short', 'clicks', 'userId']));
         await user.save();
-        const token = jwt.sign({ _id: user._id }, config.get('PrivateKey'));
-        res.status(201).header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
     }
 });
 
