@@ -56,20 +56,22 @@ async function deleteRedis(short){
     const client = redis.createClient({url: process.env.REDIS_URL});
     client.on("error", (error) => console.error("error"));
     await client.connect();
-    await client.exists('url-'+short, function(err, reply) {
+    let reply = await client.exists('url-'+short, async function(err, reply) {
         if (reply === 1) {
-            client.del('url-'+short);
-        } else {
-            console.log('Doesn\'t exist!');
+            return 1;
         }
     });
-    await client.exists('counter-'+short, function(err, reply) {
+    if (reply === 1){
+        await client.del('url-'+short, function (err, reply) {});
+    }
+    let result = await client.exists('counter-'+short, async function(err, reply) {
         if (reply === 1) {
-            client.del('counter-'+short);
-        } else {
-            console.log('Doesn\'t exist!');
+            return 1;
         }
     });
+    if(result === 1){
+        await client.del('counter-'+short, function(err, reply) {});
+    };
 }
 
 async function findClicks(short){
@@ -105,7 +107,12 @@ router.post('/', authenticateToken, async (req, res) => {
         // Insert the new user if they do not exist yet
         req.body.userId = req.user._id;
         url = new Url(_.pick(req.body, ['full', 'short', 'userId']));
-        await url.save();
+        await url.save(() => {
+            var client = redis.createClient({url: process.env.REDIS_URL});
+            client.set('counter-'+url.short, 0, (err,reply) => {
+                if (err) res.status(500).send('Error creating Redis counter instance');
+            });
+        });
     }
     res.redirect('/profile');
 })
@@ -114,14 +121,14 @@ router.post('/edit/:short', authenticateToken, async (req, res) => {
     //aca se editan los links con formulario para editar 
     const url = await Url.findOneAndUpdate({ short: req.params.short }, { short: req.body.short });
     if (url != null) return res.status(409).send('Url with that name already exists, please choose another one.');
-    updateRedis(req.params.short, req.body.short);
+    await updateRedis(req.params.short, req.body.short);
     res.status(204).redirect('/profile');
 })
 
 router.get('/delete/:short', authenticateToken, async (req, res) => {
     const url = await Url.findOneAndDelete({ short: req.params.short });
     if (url == null) return res.sendStatus(404);
-    deleteRedis(req.params.short);
+    await deleteRedis(req.params.short);
     res.status(204).redirect('/profile');
 })
 
