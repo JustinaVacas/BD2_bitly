@@ -100,18 +100,18 @@ router.get('/', authenticateToken, async (req, res) => {
 })
 
 router.post('/', authenticateToken, async (req, res) => {
-    let url = await Url.findOne({ full: req.body.full });
+    let url = await Url.findOne({ full: req.body.full,  userId: req.user._id});
     if (url) {
         return res.status(400).send('That url already exists!');
     } else {
         // Insert the new user if they do not exist yet
         req.body.userId = req.user._id;
         url = new Url(_.pick(req.body, ['full', 'short', 'userId']));
-        await url.save(() => {
-            var client = redis.createClient({url: process.env.REDIS_URL});
-            client.set('counter-'+url.short, 0, (err,reply) => {
-                if (err) res.status(500).send('Error creating Redis counter instance');
-            });
+        await url.save(async () => {
+            const client = redis.createClient({url: process.env.REDIS_URL});
+            client.on("error", (error) => console.error("error"));
+            await client.connect();
+            await client.set('counter-'+url.short, 0, (err,reply) => {});
         });
     }
     res.redirect('/profile');

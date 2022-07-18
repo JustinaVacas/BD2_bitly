@@ -9,7 +9,6 @@ const router = express.Router();
 var token;
 
 router.get('/logout', (req, res) => {
-    jwt.sign
     token = null;
     res.redirect('/');
 })
