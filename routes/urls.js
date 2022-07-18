@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { Url, validate } = require('../models/url');
+const {Url} = require('../models/url');
 const express = require('express');
 const router = express.Router();
 
@@ -17,12 +17,6 @@ function authenticateToken(req, res, next) {
 }
 
 router.post('/', authenticateToken, async (req, res) => {
-    // First Validate The Request
-    /*const { error } = validate(req.body);
-    if (error) {
-        return res.status(400).send(error.details[0].message);
-    }*/
-
     // Check if this link already exists
     let url = await Url.findOne({ full: req.body.full });
     // short
@@ -30,14 +24,28 @@ router.post('/', authenticateToken, async (req, res) => {
         return res.status(400).send('That url already exists!');
     } else {
         // Insert the new user if they do not exist yet
-        url = new Url(_.pick(req.body, ['full', 'short', 'clicks', 'userId']));
-        await user.save();
+        url = new Url(_.pick(req.body, ['full', 'short', 'userId']));
+        await url.save(() => {
+            var client = redis.createClient({url: process.env.REDIS_URL});
+            client.set(['counter-'+url.short, 0],(err,reply) => {
+                if (err) res.status(500).send('Error creating Redis counter instance');
+            });
+        });
     }
+    res.status(201).send(_.pick(url, ['_id', 'full', 'short', 'userId']));
 });
 
-router.put('/:id', async (req, res) => {})
+router.put('/:short', async (req, res) => {
+    const url = await Url.findOneAndUpdate({ short: req.params.short }, { short: req.body.short });
+    if (url != null) return res.status(409).send('Url with that name already exists, please choose another one.');
+    //borrar el caché de redis (hacer un find and delete)
+})
 
-router.get('/:id', (req,res) => {})
-
+router.delete('/:short', async (req, res) => {
+    const url = await Url.findOneAndDelete({ short: req.params.short });
+    //borrar el caché de redis (hacer un find and delete)
+    if (url == null) return res.sendStatus(404);
+    res.sendStatus(204);
+})
 
 module.exports = router;

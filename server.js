@@ -1,5 +1,3 @@
-//import { createClient } from 'redis';
-
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
@@ -30,25 +28,47 @@ const db = mongoose.connection
 db.on('error', error => console.error(error))
 db.once('open', () => console.log('Connected to Mongoose'))
 
-// const client = createClient({
-// 	url: process.env.REDIS_URL
-// });
-//
-// client.on('error', (err) => console.log('Redis Client Error', err));
-//
-// await client.connect();
-//
-// export const redisClient = client;
+// REDIS
+var redis = require('redis');
 
-const auth = require('./routes/auth');
-const users = require('./routes/users');
+const usersRouter = require('./routes/users');
+const urls = require('./routes/urls');
 const homeRouter = require('./routes/home');
 const profileRouter = require('./routes/profile');
 
+//to add custom header in all routes
+app.all('*', usersRouter.addHeader);
+
 app.use('/', homeRouter);
+app.use('/', usersRouter);
 app.use('/profile', profileRouter);
-app.use('/api/auth', auth);
-app.use('/api/users', users);
+app.use('/api/urls', urls);
+
+const {Url} = require('./models/url');
+
+app.get('/mylink/:short', async (req,res) => {
+
+  //Busqueda en caché de Redis
+  const client = redis.createClient({url:  process.env.REDIS_UR});
+  client.on("error", (error) => console.error("error"));
+  await client.connect();
+  console.log(req.params.short)
+  await client.get('url-'+req.params.short,  (err, reply) =>{
+    if (!err) {
+      client.incr('counter-'+req.params.short);  // counter++
+      return res.redirect(reply);
+    }
+  });
+  //No está en caché, busco en MongoDB
+  const url = await Url.findOne({ short: req.params.short });
+  if (url == null) return res.sendStatus(404);
+  //Agrego la url al caché de Redis
+  await client.set( 'url-'+url.short, url.full, (err, reply) => {
+    if (err) res.status(500).send('Error creating Redis url instance');
+  });
+  await client.incr('counter-'+url.short); // counter++
+  res.redirect(url.full);
+})
 
 
 app.listen(process.env.PORT || 3000);

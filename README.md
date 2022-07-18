@@ -12,7 +12,7 @@ El objetivo del TP es realizar una API que para cada usuario guarde URLs y luego
 
 ## Setup
 
-En el archivo .env se debera color el sigiente contenido:
+Crear el archivo .env y colocar el sigiente contenido:
 
         DATABASE_URL= URL de la base de datos de monogodb
         ACCES_TOKEN_SECRET= string a eleccion
