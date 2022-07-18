@@ -20,7 +20,7 @@ function authenticateToken(req, res, next) {
 }
 
 router.get('/', authenticateToken, async (req, res) => {
-    await Url.find({}, function(err, urls) {
+    await Url.find({ userId: req.user._id }, function(err, urls) {
         var urlCountMap = {};
     
         urls.forEach(async function(url) {
@@ -28,7 +28,7 @@ router.get('/', authenticateToken, async (req, res) => {
             urlCountMap[url.short] = count;
         });
     
-        res.render('profile.ejs', { urlList: urls, countMap: urlCountMap }); 
+        res.render('profile.ejs', { name: req.user.name, urlList: urls, countMap: urlCountMap }); 
     });
 })
 

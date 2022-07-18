@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
 
-<style media="screen">
+<!-- <style media="screen">
     *,
     *:before,
     *:after{
@@ -91,22 +91,22 @@
       cursor: pointer;
     }
     a{
-        color: #080710;
+        color: #ffffff;
     }
-</style>
+</style> -->
 </head>
 <body>
-  <div class="background">
+  <!-- <div class="background">
     <div class="shape"></div>
     <div class="shape"></div>
-  </div>
+  </div> -->
   <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-  <h1>Hi </h1>
+  <h1>Hi <%= name %></h1>
   <form action="/api/auth" method="DELETE">
     <button type="submit">Log Out</button>
   </form>
 
-  <div class="container">
+  <div>
     <h1>URL Shrinker</h1>
     <form action="/api/urls" method="POST" target="dummyframe" class="my-4 form-inline">
       <label for="fullUrl" class="sr-only">Url</label>
@@ -127,7 +127,7 @@
           <tr>
             <td><a href="<%= url.full %>"><%= url.full %></a></td>
             <td><a href="http://localhost:3000/mylink/<%= url.short %>">http://localhost:3000/mylink/<%= url.short %></a></td>
-            <td><%= urlCountMap[url.short] %></td>
+            <td><%= countMap[url.short] %></td>
           </tr>
         <% }) %>
       </tbody>
