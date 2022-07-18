@@ -29,7 +29,7 @@ db.on('error', error => console.error(error))
 db.once('open', () => console.log('Connected to Mongoose'))
 
 // REDIS
-var redis = require('redis');
+const redis = require('redis');
 
 const usersRouter = require('./routes/users');
 const urls = require('./routes/urls');
@@ -42,7 +42,6 @@ app.all('*', usersRouter.addHeader);
 app.use('/', homeRouter);
 app.use('/', usersRouter);
 app.use('/profile', profileRouter);
-app.use('/api/urls', urls);
 
 const {Url} = require('./models/url');
 

@@ -8,6 +8,12 @@ const express = require('express');
 const router = express.Router();
 var token;
 
+router.get('/logout', (req, res) => {
+    jwt.sign
+    token = null;
+    res.redirect('/');
+})
+
 router.get('/login', (req, res) => {
     res.render('login.ejs');
 })
@@ -25,7 +31,7 @@ router.post('/login', async (req, res) => {
     if (!validPassword) {
         return res.status(400).send('Incorrect email or password.');
     }
-    const accesToken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET);
+    const accessToken = jwt.sign({ _id: user._id }, process.env.ACCESS_TOKEN_SECRET);
     token=accessToken;
     res.redirect('profile');
 });
@@ -52,7 +58,7 @@ router.post('/register', async (req, res) => {
 });
 
 module.exports = router;
-exports.addHeader = (req, res, next) => {
+module.exports.addHeader = (req, res, next) => {
     if (!token) {
         console.log('token: undefined');
     } else {

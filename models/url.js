@@ -19,4 +19,4 @@ const Url = mongoose.model('url', new mongoose.Schema(
     { timestamps: true }
 ));
 
-module.exports = Url;
+module.exports.Url = Url;

@@ -27,7 +27,7 @@ router.post('/', authenticateToken, async (req, res) => {
         url = new Url(_.pick(req.body, ['full', 'short', 'userId']));
         await url.save(() => {
             var client = redis.createClient({url: process.env.REDIS_URL});
-            client.set(['counter-'+url.short, 0],(err,reply) => {
+            client.set('counter-'+url.short,0,(err,reply) => {
                 if (err) res.status(500).send('Error creating Redis counter instance');
             });
         });
