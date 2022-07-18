@@ -110,7 +110,7 @@ router.post('/', authenticateToken, async (req, res) => {
     res.redirect('/profile');
 })
 
-router.put('/:short', authenticateToken, async (req, res) => {
+router.post('/edit/:short', authenticateToken, async (req, res) => {
     //aca se editan los links con formulario para editar 
     const url = await Url.findOneAndUpdate({ short: req.params.short }, { short: req.body.short });
     if (url != null) return res.status(409).send('Url with that name already exists, please choose another one.');
@@ -118,11 +118,11 @@ router.put('/:short', authenticateToken, async (req, res) => {
     res.status(204).redirect('/profile');
 })
 
-router.delete('/:short', authenticateToken, async (req, res) => {
+router.get('/delete/:short', authenticateToken, async (req, res) => {
     const url = await Url.findOneAndDelete({ short: req.params.short });
     if (url == null) return res.sendStatus(404);
     deleteRedis(req.params.short);
-    res.status(204).redirect('profile');
+    res.status(204).redirect('/profile');
 })
 
 

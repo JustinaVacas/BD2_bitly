@@ -46,10 +46,7 @@
             <td><a href="<%= url.full %>"><%= url.full %></a></td>
             <td><a href="http://localhost:3000/mylink/<%= url.short %>">http://localhost:3000/mylink/<%= url.short %></a></td>
             <td><%= countMap[url.short] %></td>
-            <td><button class="btn btn-delete">
-                  <span class="mdi mdi-delete mdi-24px"></span>
-                  <span class="mdi mdi-delete-empty mdi-20px"></span>
-                </button></td>
+            <td><a href="http://localhost:3000/profile/delete/<%= url.short %>"><button>Delete</button></a></td>
           </tr>
         <% }) %>
       </tbody>
