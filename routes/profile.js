@@ -19,16 +19,81 @@ function authenticateToken(req, res, next) {
     })
 }
 
+async function updateRedis(old_short, new_short){
+    const client = redis.createClient({url: process.env.REDIS_URL});
+    await client.connect();
+    await client.get('url-' + old_short, function (err, result) {
+        if (!err) {
+            var new_full = result;
+            client.del('url-' + old_short, function (err, reply) {
+                if (reply === 1) {
+                    client.set('url-' + new_short, new_full);
+                } else {
+                    console.log('Bad delete in Redis!');
+                }
+            });
+        } else {
+            console.log('Key not found');
+        }
+    });
+    await client.get('counter-'+old_short, function(err, result) {
+        if (!err) {
+            var counter = result;
+            client.del('counter-'+old_short, function(err, reply) {
+                if (reply === 1) {
+                    client.set('url-'+new_short, counter);
+                }else {
+                    console.log('Bad delete in Redis!');
+                }
+            });
+        } else {
+            console.log('Key not found');
+        }
+    });
+}
+
+async function deleteRedis(short){
+    const client = redis.createClient({url: process.env.REDIS_URL});
+    client.on("error", (error) => console.error("error"));
+    await client.connect();
+    await client.exists('url-'+short, function(err, reply) {
+        if (reply === 1) {
+            client.del('url-'+short);
+        } else {
+            console.log('Doesn\'t exist!');
+        }
+    });
+    await client.exists('counter-'+short, function(err, reply) {
+        if (reply === 1) {
+            client.del('counter-'+short);
+        } else {
+            console.log('Doesn\'t exist!');
+        }
+    });
+}
+
+async function findClicks(short){
+    const client = redis.createClient({url: process.env.REDIS_URL});
+    client.on("error", (error) => console.error("error"));
+    await client.connect();
+    let counter = await client.get('counter-'+short, function(err, counter) {
+        if (!err) {
+            return counter;
+        } else {
+            return null;
+        }
+    });
+    return counter;
+}
+
 router.get('/', authenticateToken, async (req, res) => {
-    await Url.find({ userId: req.user._id }, function(err, urls) {
-        var urlCountMap = {};
-    
-        urls.forEach(async function(url) {
-            count = await findClicks(url.short);
-            urlCountMap[url.short] = count;
-        });
-    
-        res.render('profile.ejs', { name: req.user.name, urlList: urls, countMap: urlCountMap }); 
+    await Url.find({userId: req.user._id}, async function (err, urls) {
+        let urlCountMap = {};
+        for (const url in urls) {
+            let count = await findClicks(urls[url].short);
+            urlCountMap[urls[url].short] = count;
+        }
+        res.render('profile.ejs', {urlList: urls, countMap: urlCountMap});
     });
 })
 
@@ -39,7 +104,6 @@ router.post('/', authenticateToken, async (req, res) => {
     } else {
         // Insert the new user if they do not exist yet
         req.body.userId = req.user._id;
-        console.log("req.body " + req.body)
         url = new Url(_.pick(req.body, ['full', 'short', 'userId']));
         await url.save();
     }
@@ -61,73 +125,5 @@ router.delete('/:short', authenticateToken, async (req, res) => {
     res.status(204).redirect('profile');
 })
 
-
-async function updateRedis(old_short, new_short){
-  const client = redis.createClient({url:  process.env.REDIS_UR});
-  client.on("error", (error) => console.error("error"));
-  await client.connect();
-  await client.get('url-'+old_short, function(err, result) {
-    if (!err) {
-        var new_full = result;
-        client.del('url-'+old_short, function(err, reply) {
-            if (reply === 1) {
-                client.set('url-'+new_short, new_full);
-            }else {
-                console.log('Bad delete in Redis!');
-            }
-        });
-    } else {
-      console.log('Key not found');
-    }
-  });
-  await client.get('counter-'+old_short, function(err, result) {
-    if (!err) {
-        var counter = result;
-        client.del('counter-'+old_short, function(err, reply) {
-            if (reply === 1) {
-                client.set('url-'+new_short, counter);
-            }else {
-                console.log('Bad delete in Redis!');
-            }
-        });
-    } else {
-      console.log('Key not found');
-    }
-  });
-}
-
-async function deleteRedis(short){
-    const client = redis.createClient({url:  process.env.REDIS_UR});
-    client.on("error", (error) => console.error("error"));
-    await client.connect();
-    await client.exists('url-'+short, function(err, reply) {
-      if (reply === 1) {
-        client.del('url-'+short);
-      } else {
-        console.log('Doesn\'t exist!');
-      }
-    });
-    await client.exists('counter-'+short, function(err, reply) {
-        if (reply === 1) {
-          client.del('counter-'+short);
-        } else {
-          console.log('Doesn\'t exist!');
-        }
-    });
-}
-
-async function findClicks(short){
-    const client = redis.createClient({url:  process.env.REDIS_UR});
-    client.on("error", (error) => console.error("error"));
-    await client.connect();
-    await client.get('counter-'+short, function(err, counter) {
-        if (!err) {
-            return counter;
-        } else {
-            console.log('Counter not found');
-            return null;
-        }
-    });
-}
 
 module.exports = router;

@@ -10,107 +10,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
 
-<!-- <style media="screen">
-    *,
-    *:before,
-    *:after{
-      padding: 0;
-      margin: 0;
-      box-sizing: border-box;
-    }
-    body{
-      background-color: #080710;
-    }
-    .background{
-      width: 430px;
-      height: 520px;
-      position: absolute;
-      transform: translate(-50%,-50%);
-      left: 50%;
-      top: 50%;
-    }
-    .background .shape{
-      height: 200px;
-      width: 200px;
-      position: absolute;
-      border-radius: 50%;
-    }
-    .shape:first-child{
-      background: linear-gradient(
-          #1845ad,
-          #23a2f6
-      );
-      left: -80px;
-      top: -80px;
-    }
-    .shape:last-child{
-      background: linear-gradient(
-          to right,
-          #ff512f,
-          #f09819
-      );
-      right: -30px;
-      bottom: -80px;
-    }
-    .container{
-      height: 420px;
-      width: 400px;
-      background-color: rgba(255,255,255,0.13);
-      position: absolute;
-      transform: translate(-50%,-50%);
-      top: 50%;
-      left: 50%;
-      border-radius: 10px;
-      backdrop-filter: blur(10px);
-      border: 2px solid rgba(255,255,255,0.1);
-      box-shadow: 0 0 40px rgba(8,7,16,0.6);
-      padding: 50px 35px;
-    }
-    .container *{
-      font-family: 'Poppins',sans-serif;
-      letter-spacing: 0.5px;
-      outline: none;
-      border: none;
-    }
-    .container h3{
-      font-size: 32px;
-      font-weight: 500;
-      line-height: 42px;
-      text-align: center;
-      color: #ffffff;
-    }
-    button{
-      margin-top: 50px;
-      width: 100%;
-      background-color: #ffffff;
-      color: #080710;
-      padding: 15px 0;
-      font-size: 18px;
-      font-weight: 600;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    a{
-        color: #ffffff;
-    }
-</style> -->
+<style media="screen">
+
+
+</style>
 </head>
 <body>
   <!-- <div class="background">
     <div class="shape"></div>
     <div class="shape"></div>
   </div> -->
-  <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-  <h1>Hi <%= name %></h1>
   <form action="/api/auth" method="DELETE">
-    <button type="submit">Log Out</button>
   </form>
 
   <div>
     <h1>URL Shrinker</h1>
-    <form action="/api/urls" method="POST" target="dummyframe" class="my-4 form-inline">
+    <form action="/profile" method="POST" class="my-4 form-inline">
       <label for="fullUrl" class="sr-only">Url</label>
-      <input required placeholder="Url" type="url" name="fullUrl" id="fullUrl" class="form-control col mr-2">
+      <input required placeholder="Url" type="url" name="full" id="fullUrl" class="form-control col mr-2">
       <button class="btn btn-success" type="submit">Shrink</button>
     </form>
     
@@ -120,6 +37,7 @@
           <th>Full URL</th>
           <th>Short URL</th>
           <th>Clicks</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -128,6 +46,10 @@
             <td><a href="<%= url.full %>"><%= url.full %></a></td>
             <td><a href="http://localhost:3000/mylink/<%= url.short %>">http://localhost:3000/mylink/<%= url.short %></a></td>
             <td><%= countMap[url.short] %></td>
+            <td><button class="btn btn-delete">
+                  <span class="mdi mdi-delete mdi-24px"></span>
+                  <span class="mdi mdi-delete-empty mdi-20px"></span>
+                </button></td>
           </tr>
         <% }) %>
       </tbody>
