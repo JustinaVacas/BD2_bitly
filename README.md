@@ -8,7 +8,13 @@
 
 ## Enunciado
 
-El objetivo del TP es realizar una API que para cada usuario guarde URLs y luego acortarlas, como Bitly.
+El objetivo del TP es realizar una API que para cada usuario guarde URLs y luego acortarlas.
+
+## Requisitos
+
+* Node
+* Una base de datos MongoDB
+* Una base de datos Redis
 
 ## Setup
 
