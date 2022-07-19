@@ -46,7 +46,6 @@ app.use('/profile', profileRouter);
 const {Url} = require('./models/url');
 
 app.get('/mylink/:short', async (req,res) => {
-
   //Busqueda en caché de Redis
   const client = redis.createClient({url:  process.env.REDIS_URL});
   client.on("error", (error) => console.error("error"));
